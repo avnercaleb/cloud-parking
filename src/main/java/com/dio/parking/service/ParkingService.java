@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.dio.parking.model.Parking;
+import com.dio.parking.service.exception.ParkingNotFoundException;
 
 @Service
 public class ParkingService {
@@ -31,7 +32,11 @@ public class ParkingService {
 	}
 	
 	public Parking findById(String id) {
-		return parkingMap.get(id);
+		Parking parking = parkingMap.get(id);
+		if(parking == null) {
+			throw new ParkingNotFoundException("Nenhum registro encontrado para o ID informado.");
+		}
+		return parking;
 	}
 	
 	public Parking create(Parking parkingCreate) {
@@ -45,4 +50,17 @@ public class ParkingService {
 	private static String getUUID() {
 		return UUID.randomUUID().toString().replace("-", "");
 	}
+	
+	public void delete(String id) {
+		findById(id);
+		parkingMap.remove(id);
+	}
+	
+	public Parking update(String id, Parking parkingUpdate) {
+		Parking parking = findById(id);
+		parking.setColor(parkingUpdate.getColor());
+		parkingMap.replace(id, parking);
+		return parking;
+	}
+	
 }
